@@ -3,9 +3,9 @@ from mesa.visualization.ModularVisualization import ModularServer
 from model import Student, KSUModel
 from typing import Dict
 
-GLOBAL_OPT = {
+GLOBAL_OPTS = {
     "n_students": 10,
-    "width": 10,
+    "width": 12,
     "height": 10,
     "width_pixels": 500,
     "height_pixels": 500,
@@ -16,12 +16,8 @@ def set_agent_params(agent: Student) -> Dict:
     gender = "male" if agent.gender == "M" else "female"
 
     return {
-        "Color": "red",
-        "Filled": "true",
         "Layer": 0,
-        "Shape": "circle",
         "Shape": f"assets/{gender}-student.png",
-        "r": 0.5,
         "scale": 0.9,
         "Major": agent.major,
         "Gender": agent.gender,
@@ -30,18 +26,18 @@ def set_agent_params(agent: Student) -> Dict:
 
 def model_params() -> Dict:
     return {
-        "n_students": GLOBAL_OPT["n_students"],
-        "width": GLOBAL_OPT["width"],
-        "height": GLOBAL_OPT["height"],
+        "n_students": GLOBAL_OPTS["n_students"],
+        "width": GLOBAL_OPTS["width"],
+        "height": GLOBAL_OPTS["height"],
     }
 
 
 grid = CanvasGrid(
     set_agent_params,
-    GLOBAL_OPT["width"],
-    GLOBAL_OPT["height"],
-    GLOBAL_OPT["width_pixels"],
-    GLOBAL_OPT["height_pixels"],
+    GLOBAL_OPTS["width"],
+    GLOBAL_OPTS["height"],
+    GLOBAL_OPTS["width_pixels"],
+    GLOBAL_OPTS["height_pixels"],
 )
 
 server = ModularServer(KSUModel, [grid], "KSU Simulation", model_params())

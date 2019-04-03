@@ -22,9 +22,12 @@ class KSUModel(Model):
     MODEL_STAGES = ["semester_one"]
 
     def __init__(self, n_students, width: int, height: int):
+        self.running = True
         self.n_students: int = n_students
         self.schedule = StagedActivation(self, stage_list=self.MODEL_STAGES)
         self.grid = SingleGrid(width, height, torus=False)
+
+        # Generate Data for Agents
         self.ALL_MAJORS = gen_major(self.n_students)
         self.ALL_GENDERS = gen_gender(self.n_students)
 
@@ -35,11 +38,7 @@ class KSUModel(Model):
 
             self.schedule.add(student)
 
-            # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-
-            self.grid.position_agent(student, (x, y))
+            self.grid.position_agent(student, x=0, y=i)
 
     def step(self):
         self.schedule.step()
