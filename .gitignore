@@ -3,6 +3,7 @@
 
 # Python
 .venv/
+*.pyc
 
 # Sublime Text
 odintech.ksu_retention_simulator.sublime-project
