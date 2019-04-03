@@ -32,7 +32,7 @@ total_students
 ```
 
 
-## Start of Term
+## Start of Semester's 1 Term
 
 ```{r}
 f1seq1_majors <- cob_rt %>%
@@ -57,7 +57,7 @@ sample(
 ```{r}
 f1seq1_majors %>%
   select(F1SEQ1_MAJOR, Probability) %>%
-  write.csv(file = "data/major_prob.csv", row.names = F)
+  write.csv(file = "data/f1seq1_major_probs.csv", row.names = F)
 ```
 
 
