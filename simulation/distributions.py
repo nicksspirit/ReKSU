@@ -23,7 +23,13 @@ def gen_major(n_students: int, semester: str = "s1seq1") -> List[str]:
     return majors
 
 
+gender_df = pd.read_csv(DATA_PATH / "gender_probs.csv", index_col="GENDER")
+GENDER = gender_df.index.values
+GENDER_PROBS = gender_df["Probability"].values
+
+
+def gen_gender(n_students: int) -> List[str]:
     majors = np.random.choice(
-        MAJOR_CODES, size=n_students, replace=True, p=MAJOR_PROBS)
+        GENDER, size=n_students, replace=True, p=GENDER_PROBS)
 
     return majors

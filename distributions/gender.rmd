@@ -1,0 +1,63 @@
+---
+title: "Distribution of Majors"
+output: github_document
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(
+  fig.path = "markdown_figs/data_preparation-"
+)
+```
+
+```{r}
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+```
+
+```{r}
+cob_rt <- read.csv("data/COB_RT_Data.csv", na.strings = c("", "XX"))
+```
+
+# Gender of Students
+
+```{r}
+total_students <- cob_rt %>%
+  select(StudNum) %>%
+  distinct() %>%
+  count() %>% 
+  use_series("n")
+
+total_students
+```
+
+
+## Start of Term
+
+```{r}
+gender <- cob_rt %>%
+  select(GENDER) %>%
+  group_by(GENDER) %>%
+  summarise(freq = n()) %>%
+  mutate(Probability = freq/total_students) %>%
+  arrange(desc(Probability))
+
+gender
+```
+
+```{r}
+sample(
+  gender$GENDER,
+  size = 10, 
+  replace = T,
+  prob = gender$Probability
+)
+```
+
+```{r}
+gender %>%
+  select(GENDER, Probability) %>%
+  write.csv(file = "data/gender_probs.csv", row.names = F)
+```
+
+

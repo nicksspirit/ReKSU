@@ -1,15 +1,16 @@
 from mesa import Agent, Model
 from mesa.space import SingleGrid
 from mesa.time import StagedActivation
-from distributions import gen_major
+from distributions import gen_major, gen_gender
 
 
 class Student(Agent):
     """An Agent Student"""
 
-    def __init__(self, unique_id, model: Model, major):
+    def __init__(self, unique_id, model: Model, major, gender):
         super().__init__(unique_id, model)
         self.major: str = major
+        self.gender: str = gender
 
     def semester_one(self):
         pass
@@ -25,11 +26,12 @@ class KSUModel(Model):
         self.schedule = StagedActivation(self, stage_list=self.MODEL_STAGES)
         self.grid = SingleGrid(width, height, torus=False)
         self.ALL_MAJORS = gen_major(self.n_students)
-        self.running = True
+        self.ALL_GENDERS = gen_gender(self.n_students)
 
         for i in range(self.n_students):
             major = self.ALL_MAJORS[i]
-            student = Student(i, self, major)
+            gender = self.ALL_GENDERS[i]
+            student = Student(i, self, major, gender)
 
             self.schedule.add(student)
 

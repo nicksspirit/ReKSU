@@ -13,13 +13,18 @@ GLOBAL_OPT = {
 
 
 def set_agent_params(agent: Student) -> Dict:
+    gender = "male" if agent.gender == "M" else "female"
+
     return {
         "Color": "red",
         "Filled": "true",
         "Layer": 0,
         "Shape": "circle",
+        "Shape": f"assets/{gender}-student.png",
         "r": 0.5,
+        "scale": 0.9,
         "Major": agent.major,
+        "Gender": agent.gender,
     }
 
 
