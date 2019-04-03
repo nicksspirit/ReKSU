@@ -1,0 +1,63 @@
+---
+title: "Distribution of Majors"
+output: github_document
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(
+  fig.path = "markdown_figs/data_preparation-"
+)
+```
+
+```{r}
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+```
+
+```{r}
+cob_rt <- read.csv("data/COB_RT_Data.csv", na.strings = c("", "XX"))
+```
+
+# Semester 1's Distribution of Majors 
+
+```{r}
+total_students <- cob_rt %>%
+  select(StudNum) %>%
+  distinct() %>%
+  count() %>% 
+  use_series("n")
+
+total_students
+```
+
+
+## Start of Term
+
+```{r}
+f1seq1_majors <- cob_rt %>%
+  select(F1SEQ1_MAJOR) %>%
+  group_by(F1SEQ1_MAJOR) %>%
+  summarise(freq = n()) %>%
+  mutate(Probability = freq/total_students) %>%
+  arrange(desc(Probability))
+
+f1seq1_majors
+```
+
+```{r}
+sample(
+  f1seq1_majors$F1SEQ1_MAJOR,
+  size = 1, 
+  replace = T,
+  prob = f1seq1_majors$Probability
+)
+```
+
+```{r}
+f1seq1_majors %>%
+  select(F1SEQ1_MAJOR, Probability) %>%
+  write.csv(file = "data/major_prob.csv", row.names = F)
+```
+
+
