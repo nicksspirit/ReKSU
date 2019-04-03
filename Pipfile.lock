@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "71f9e8565b517dfd35bf04deb12ddc1bcfa867d53212596431fcbc6c04b6b02b"
+            "sha256": "3386b008fe762b5905c277936a4bf1fdf88f0c6be30e63fcd8093541a0cb9f88"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -635,11 +635,21 @@
             "version": "==0.1.2"
         },
         "python-language-server": {
+            "extras": [
+                "yapf"
+            ],
             "hashes": [
                 "sha256:1a746a4031938df03ee546fa4760895b6a6e420a07d58161b064945add6449ef"
             ],
             "index": "pypi",
             "version": "==0.26.1"
+        },
+        "yapf": {
+            "hashes": [
+                "sha256:edb47be90a56ca6f3075fe24f119a22225fbd62c66777b5d3916a7e9e793891b",
+                "sha256:f58069d5e0df60c078f3f986b8a63acfda73aa6ebb7cd423f6eabd1cb06420ba"
+            ],
+            "version": "==0.26.0"
         }
     }
 }
