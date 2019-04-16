@@ -1,6 +1,6 @@
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.ModularVisualization import ModularServer
-from model import Student, KSUModel
+from model import Student, ActiveStudent, InactiveStudent, KSUModel
 from typing import Dict, Union
 
 GLOBAL_OPTS = {
@@ -15,11 +15,20 @@ GLOBAL_OPTS = {
 def set_agent_params(agent: Student) -> Dict:
     base_params: Dict[str, Union[str, int, float]] = {"text_color": "white"}
 
-    if isinstance(agent, Student):
+    if isinstance(agent, ActiveStudent):
         gender = "male" if agent.gender == "M" else "female"
         base_params["Layer"] = 1
         base_params["Shape"] = f"assets/images/{gender}-student.png"
         base_params["scale"] = 0.8
+        base_params["Major"] = agent.major
+        base_params["Gender"] = agent.gender
+    if isinstance(agent, InactiveStudent):
+        base_params["Layer"] = 1
+        base_params["Filled"] = 1
+        base_params["Color"] = "grey"
+        base_params["Shape"] = "rect"
+        base_params["w"] = 1
+        base_params["h"] = 1
         base_params["Major"] = agent.major
         base_params["Gender"] = agent.gender
 

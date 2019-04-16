@@ -3,6 +3,7 @@ from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation
 from distributions import gen_gender
 from itertools import product, cycle
+import numpy as np
 
 
 class Student(Agent):
@@ -18,6 +19,23 @@ class Student(Agent):
 
     def advance(self):
         pass
+
+
+class ActiveStudent(Student):
+    """An Active Agent Student"""
+
+    def __init__(self, unique_id, model: Model, major, gender, state):
+        super().__init__(unique_id, model, major, gender)
+
+        self.state: int = 1
+
+
+class InactiveStudent(Student):
+    """A Inactive Agent Student"""
+    def __init__(self, unique_id, model: Model, major, gender, state):
+        super().__init__(unique_id, model, major, gender)
+
+        self.state: int = 0
 
 
 class KSUModel(Model):
@@ -36,7 +54,10 @@ class KSUModel(Model):
 
         # Adding Student to KSU Environment
         for i in range(self.n_students):
-            student = Student(i, self, "Undeclared", self.ALL_GENDERS[i])
+            if np.random.binomial(1, 0.80):
+                student = ActiveStudent(i, self, "Undeclared", self.ALL_GENDERS[i], 1)
+            else:
+                student = InactiveStudent(i, self, "Undeclared", self.ALL_GENDERS[i], 0)
 
             self.schedule.add(student)
             self.grid.position_agent(student)

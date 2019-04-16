@@ -1,15 +1,14 @@
 var TextModule = function() {
-    let tag = "<div class='lead'></div>";
-    let text = $(tag)[0];
+    let tag =  $("<div class='lead'></div>");
 
     // Append text tag to #sidebar:
-    $("#sidebar").append(text);
+    $("#sidebar").append(tag);
 
     this.render = function(data) {
-        $(text).html(data);
+        tag.html(data);
     };
 
     this.reset = function() {
-        $(text).html("");
+        tag.html("");
     };
 };
