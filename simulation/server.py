@@ -1,37 +1,27 @@
-from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.ModularVisualization import ModularServer
-from model import Student, SemesterCell, KSUModel
+from model import Student, KSUModel
 from typing import Dict, Union
 
 GLOBAL_OPTS = {
-    "n_students": 20,
-    "width": 24,
+    "n_students": 150,
+    "width": 20,
     "height": 20,
-    "width_pixels": 1000,
-    "height_pixels": 1000,
+    "width_pixels": 500,
+    "height_pixels": 500,
 }
 
 
-def set_agent_params(agent: Union[Student, SemesterCell]) -> Dict:
-    base_params: Dict[str, Union[str, int, float]] = {
-        "text_color": "white",
-    }
+def set_agent_params(agent: Student) -> Dict:
+    base_params: Dict[str, Union[str, int, float]] = {"text_color": "white"}
 
     if isinstance(agent, Student):
         gender = "male" if agent.gender == "M" else "female"
         base_params["Layer"] = 1
-        base_params["Shape"] = f"assets/{gender}-student.png"
+        base_params["Shape"] = f"assets/images/{gender}-student.png"
         base_params["scale"] = 0.8
         base_params["Major"] = agent.major
         base_params["Gender"] = agent.gender
-    elif isinstance(agent, SemesterCell):
-        base_params["Layer"] = 0
-        base_params["Shape"] = "rect"
-        base_params["w"] = 1
-        base_params["h"] = 1
-        base_params["Color"] = "grey"
-        base_params["Filled"] = "true"
-        base_params["text"] = agent.semester_code
 
     return base_params
 
@@ -43,7 +33,19 @@ model_params = {
 }
 
 
-grid = CanvasGrid(
+class SemesterElement(TextElement):
+    """Display the semester"""
+
+    local_includes = ["assets/js/TextModule.js"]
+
+    def __init__(self):
+        pass
+
+    def render(self, model: KSUModel):
+        return f"Semester: {model.semester}"
+
+
+canvas_grid = CanvasGrid(
     set_agent_params,
     GLOBAL_OPTS["width"],
     GLOBAL_OPTS["height"],
@@ -51,7 +53,11 @@ grid = CanvasGrid(
     GLOBAL_OPTS["height_pixels"],
 )
 
-server = ModularServer(KSUModel, [grid], "KSU Simulation", model_params)
+semester_code = SemesterElement()
+
+server = ModularServer(
+    KSUModel, [canvas_grid, semester_code], "KSU Simulation", model_params
+)
 
 server.port = 8521  # The default
 server.launch()
