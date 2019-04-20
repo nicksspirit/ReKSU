@@ -1,24 +1,29 @@
 import pandas as pd
 import numpy as np
-from typing import List
+from typing import List, Tuple, Dict
 from pathlib import Path
+import cytoolz as tlz
 
 DATA_PATH = Path.cwd().parent / "distributions" / "data"
 
-majors_df = pd.read_csv(DATA_PATH / "f1seq1_major_probs.csv", index_col="F1SEQ1_MAJOR")
-F1SEQ1_MAJOR_CODES = majors_df.index.values
-F1SEQ1_MAJOR_PROBS = majors_df["Probability"].values
+# F1SEQ1_MAJORS (2011)
+
+f1seq1_majors_df = pd.read_csv(
+    DATA_PATH / "f1seq1_major_probs_2011.csv", index_col="F1SEQ1_MAJOR"
+)
+F1SEQ1_MAJOR_CODES = f1seq1_majors_df.index.values
+F1SEQ1_MAJOR_PROBS = f1seq1_majors_df["Probability"].values
 
 
-def gen_major(n_students: int, semester: str = "s1seq1") -> List[str]:
-
-    if semester == "s1seq1":
-        majors = np.random.choice(
-            F1SEQ1_MAJOR_CODES, size=n_students, replace=True, p=F1SEQ1_MAJOR_PROBS
-        )
+def gen_f1seq1_majors(n_students: int) -> List[str]:
+    majors = np.random.choice(
+        F1SEQ1_MAJOR_CODES, size=n_students, replace=True, p=F1SEQ1_MAJOR_PROBS
+    )
 
     return majors
 
+
+# Genders
 
 gender_df = pd.read_csv(DATA_PATH / "gender_probs.csv", index_col="GENDER")
 GENDER = gender_df.index.values
@@ -29,3 +34,46 @@ def gen_gender(n_students: int) -> List[str]:
     majors = np.random.choice(GENDER, size=n_students, replace=True, p=GENDER_PROBS)
 
     return majors
+
+
+# Conditional Probabilities of MAJORS (2011)
+
+# P(F1SEQ2_MAJOR | F1SEQ1_MAJOR)
+
+
+class MajorSwitch:
+    sem_major_df: Dict[Tuple[str, str], pd.DataFrame] = {}
+
+    def __init__(self):
+        self.sem_major_df[("F1SEQ1_MAJOR", "F1SEQ2_MAJOR")] = pd.read_csv(
+            DATA_PATH / "f1seq1_2_major_cprobs_2011.csv"
+        )
+        self.sem_major_df[("F1SEQ2_MAJOR", "S1SEQ2_MAJOR")] = pd.read_csv(
+            DATA_PATH / "f1_s1_seq2_major_cprobs_2011.csv"
+        )
+
+    def get_major(self, prev_sem: str, next_sem: str, curr_major: str) -> str:
+        """Get major for next semester given current major
+
+        Args:
+            prev_sem (str): current semester
+            next_sem (str): semester for which you want the most probable major
+            curr_major (str): major in the current semester
+
+        Returns: most probable major
+            str
+        """
+        if (prev_sem, next_sem) not in self.sem_major_df.keys():
+            return curr_major
+
+        sem_majors = self.sem_major_df[(prev_sem, next_sem)].loc[
+            lambda df: df[prev_sem] == curr_major
+        ]
+        next_sem_major_probs = sem_majors["cProb"].values
+        next_sem_majors = sem_majors[next_sem].values
+
+        return tlz.first(
+            np.random.choice(
+                next_sem_majors, size=1, replace=True, p=next_sem_major_probs
+            )
+        )
