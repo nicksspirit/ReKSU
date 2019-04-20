@@ -19,10 +19,28 @@ library(ggplot2)
 cob_rt <- read.csv("data/COB_RT_Data.csv", na.strings = c("", "XX"))
 ```
 
+## Filter Students August 2011
+
+```{r}
+term_2011_df <- cob_rt %>% filter(TERM == 201180)
+```
+
+### Recode `NA` as `UNDECLARED`
+
+```{r}
+f1_seq1_df <-term_2011_df %>%
+  select(F1SEQ1_MAJOR) %>%
+  mutate_all(as.character) %>%
+  replace_na(list(F1SEQ1_MAJOR = "UNDECLARED")) %>%
+  mutate_all(as.factor)
+
+summary(f1_seq1_df)
+```
+
 # Semester 1's Distribution of Majors 
 
 ```{r}
-total_students <- cob_rt %>%
+total_students <- term_2011_df %>%
   select(StudNum) %>%
   distinct() %>%
   count() %>% 
@@ -35,29 +53,20 @@ total_students
 ## Start of Semester's 1 Term
 
 ```{r}
-f1seq1_majors <- cob_rt %>%
+f1seq1_majors <- term_2011_df %>%
   select(F1SEQ1_MAJOR) %>%
   group_by(F1SEQ1_MAJOR) %>%
   summarise(freq = n()) %>%
   mutate(Probability = freq/total_students) %>%
   arrange(desc(Probability))
 
-f1seq1_majors
-```
-
-```{r}
-sample(
-  f1seq1_majors$F1SEQ1_MAJOR,
-  size = 1, 
-  replace = T,
-  prob = f1seq1_majors$Probability
-)
+head(f1seq1_majors)
 ```
 
 ```{r}
 f1seq1_majors %>%
   select(F1SEQ1_MAJOR, Probability) %>%
-  write.csv(file = "data/f1seq1_major_probs.csv", row.names = F)
+  write.csv(file = "data/f1seq1_majors_prob_2011.csv", row.names = F)
 ```
 
 
