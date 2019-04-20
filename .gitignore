@@ -8,7 +8,10 @@
 # Sublime Text
 odintech.ksu_retention_simulator.sublime-project
 odintech.ksu_retention_simulator.sublime-workspace
-pyls.sh
 
 # VS Code
 .vscode/
+
+# R & Rstudio
+*.Rhistory
+*.RData
