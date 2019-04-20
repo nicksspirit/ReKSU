@@ -12,60 +12,75 @@ knitr::opts_chunk$set(
 ```{r}
 library(dplyr)
 library(magrittr)
-library(ggplot2)
+library(tidyr)
 ```
+
+## Load The Dataset
 
 ```{r}
 cob_rt <- read.csv("data/COB_RT_Data.csv", na.strings = c("", "XX"))
 ```
 
-## Filter Students August 2011
+## Filter Students by August 2011
 
 ```{r}
 term_2011_df <- cob_rt %>% filter(TERM == 201180)
 ```
 
+## Distribution of Majors in `F1_SEQ1`
+
 ### Recode `NA` as `UNDECLARED`
+
+```{r recode_na}
+recode_na <- function(df, ..., replacement = c("UNDECLARED")){
+  # capture expressions and create quosures
+  dots <- enquos(...)
+  col_names <- as.character(dots) %>% gsub("~", "", .)
+  
+  if (length(replacement) > 1) {
+    replacement_list <- replacement
+  } else {
+    replacement_list <- rep(replacement, ...length())
+  }
+  
+  replacement_list <- replacement_list %>% 
+      as.list() %>% 
+      set_names(col_names) %>% 
+      as.data.frame() 
+  
+  df %>%
+   select(...) %>%
+    mutate_all(as.character) %>%
+    replace_na(replacement_list) %>%
+    mutate_all(as.factor)
+}
+```
 
 ```{r}
 f1_seq1_df <-term_2011_df %>%
-  select(F1SEQ1_MAJOR) %>%
-  mutate_all(as.character) %>%
-  replace_na(list(F1SEQ1_MAJOR = "UNDECLARED")) %>%
-  mutate_all(as.factor)
+  recode_na(F1SEQ1_MAJOR)
 
 summary(f1_seq1_df)
 ```
 
-# Semester 1's Distribution of Majors 
+### Computing Probababilites for each Major in `F1_SEQ1`
 
 ```{r}
-total_students <- term_2011_df %>%
-  select(StudNum) %>%
-  distinct() %>%
-  count() %>% 
-  use_series("n")
-
-total_students
-```
-
-
-## Start of Semester's 1 Term
-
-```{r}
-f1seq1_majors <- term_2011_df %>%
+f1seq1_major_probs <- f1_seq1_df %>%
   select(F1SEQ1_MAJOR) %>%
   group_by(F1SEQ1_MAJOR) %>%
   summarise(freq = n()) %>%
-  mutate(Probability = freq/total_students) %>%
-  arrange(desc(Probability))
+  mutate(P = freq/sum(freq)) %>%
+  arrange(desc(P))
 
-head(f1seq1_majors)
+head(f1seq1_major_probs)
 ```
 
+### Save Probabilites
+
 ```{r}
-f1seq1_majors %>%
-  select(F1SEQ1_MAJOR, Probability) %>%
+f1seq1_major_probs %>%
+  select(F1SEQ1_MAJOR, P) %>%
   write.csv(file = "data/f1seq1_majors_prob_2011.csv", row.names = F)
 ```
 
