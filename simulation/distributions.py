@@ -60,6 +60,9 @@ class MajorSwitch:
         self.sem_major_df[("S2SEQ2_MAJOR", "F3SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "s2_f3_seq2_major_cprobs_2011.csv"
         )
+        self.sem_major_df[("F3SEQ2_MAJOR", "S3SEQ2_MAJOR")] = pd.read_csv(
+            DATA_PATH / "f3_s3_seq2_major_cprobs_2011.csv"
+        )
 
     def get_major(self, prev_sem: str, next_sem: str, curr_major: str) -> str:
         """Get major for next semester given current major
