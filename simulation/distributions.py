@@ -12,7 +12,7 @@ f1seq1_majors_df = pd.read_csv(
     DATA_PATH / "f1seq1_major_probs_2011.csv", index_col="F1SEQ1_MAJOR"
 )
 F1SEQ1_MAJOR_CODES = f1seq1_majors_df.index.values
-F1SEQ1_MAJOR_PROBS = f1seq1_majors_df["Probability"].values
+F1SEQ1_MAJOR_PROBS = f1seq1_majors_df["P"].values
 
 
 def gen_f1seq1_majors(n_students: int) -> List[str]:
