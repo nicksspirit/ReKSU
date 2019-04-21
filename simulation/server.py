@@ -1,7 +1,8 @@
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.ModularVisualization import ModularServer
 from model import Student, ActiveStudent, InactiveStudent, KSUModel
-from typing import Dict, Union
+from typing import Dict, Any
+import cytoolz as tlz
 
 GLOBAL_OPTS = {
     "n_students": 150,
@@ -13,24 +14,24 @@ GLOBAL_OPTS = {
 
 
 def set_agent_params(agent: Student) -> Dict:
-    base_params: Dict[str, Union[str, int, float]] = {"text_color": "white"}
+    base_params: Dict[str, Any] = {
+        "Layer": 1,
+        "text_color": "white",
+        "Gender": agent.gender
+    }
 
     if isinstance(agent, ActiveStudent):
         gender = "male" if agent.gender == "M" else "female"
-        base_params["Layer"] = 1
         base_params["Shape"] = f"assets/images/{gender}-student.png"
         base_params["scale"] = 0.8
-        base_params["Major"] = agent.major
-        base_params["Gender"] = agent.gender
+        base_params["Major"] = tuple(tlz.unique(agent.majors))
     if isinstance(agent, InactiveStudent):
-        base_params["Layer"] = 1
         base_params["Filled"] = 1
         base_params["Color"] = "grey"
         base_params["Shape"] = "rect"
         base_params["w"] = 1
         base_params["h"] = 1
-        base_params["Major"] = agent.major
-        base_params["Gender"] = agent.gender
+        base_params["Major"] = agent.majors
 
     return base_params
 
@@ -43,7 +44,7 @@ model_params = {
 
 
 class SemesterElement(TextElement):
-    """Display the semester"""
+    """Display the semester code"""
 
     local_includes = ["assets/js/TextModule.js"]
 
