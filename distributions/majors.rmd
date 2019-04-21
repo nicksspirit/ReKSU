@@ -142,24 +142,6 @@ summary(f1_s1_seq2_df)
 ### Computing Conditional Probability
 
 $$P(S1SEQ2_{MAJOR} | F1SEQ2_{MAJOR})$$
-```{r compute_probs}
-compute_probs <- function(df, ...) {
-  # capture expressions and create quosures
-  dots <- enquos(...)
-  condition <- as.character(dots) %>% gsub("~", "", .) %>% magrittr::extract(1)
-
-  df %>%
-    # Joint Probability of $P(F1SEQ1_MAJOR, F1SEQ2_MAJOR)$
-    group_by(...) %>%
-    summarize(freq = n()) %>%
-    ungroup() %>%
-    mutate(jProb = freq / sum(freq)) %>%
-    # Marginal Probability of  $P(F1SEQ1_MAJOR)$
-    group_by_at(vars(condition)) %>%
-    mutate(mProb = sum(jProb)) %>%
-    mutate(cProb = jProb/mProb)
-}
-```
 
 ```{r find-probabilities}
 f1_s1_seq2_cprob <- f1_s1_seq2_df %>%
@@ -271,7 +253,7 @@ summary(f3_s3_seq2_df)
 
 ### Computing Conditional Probability
 
-$$P(S3SEQ2_{MAJOR} | S3SEQ2_{MAJOR})$$
+$$P(S3SEQ2_{MAJOR} | F3SEQ2_{MAJOR})$$
 
 ```{r find-probabilities}
 f3_s3_seq2_cprob <- f3_s3_seq2_df %>%
@@ -299,7 +281,7 @@ summary(s3_f4_seq2_df)
 
 ### Computing Conditional Probability
 
-$$P(S3SEQ2_{MAJOR} | S3SEQ2_{MAJOR})$$
+$$P(F4SEQ2_{MAJOR} | S3SEQ2_{MAJOR})$$
 
 ```{r find-probabilities}
 s3_f4_seq2_cprob <- s3_f4_seq2_df %>%
@@ -327,7 +309,7 @@ summary(f4_s4_seq2_df)
 
 ### Computing Conditional Probability
 
-$$P(S3SEQ2_{MAJOR} | S3SEQ2_{MAJOR})$$
+$$P(S4SEQ2_{MAJOR} | F4SEQ2_{MAJOR})$$
 
 ```{r find-probabilities}
 f4_s4_seq2_cprob <- f4_s4_seq2_df %>%
@@ -355,7 +337,7 @@ summary(s4_f5_seq2_df)
 
 ### Computing Conditional Probability
 
-$$P(S4SEQ2_{MAJOR} | F5SEQ2_{MAJOR})$$
+$$P(F5SEQ2_{MAJOR} | S4SEQ2_{MAJOR})$$
 
 ```{r find-probabilities}
 s4_f5_seq2_cprob <- s4_f5_seq2_df %>%
