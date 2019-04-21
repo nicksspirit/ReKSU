@@ -1,18 +1,25 @@
 from mesa import Agent, Model
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation
-from distributions import gen_gender
+from distributions import gen_gender, gen_f1seq1_majors, MajorSwitch
 from itertools import product, cycle
+from typing import List, Deque
+from collections import deque
+import cytoolz as tlz
 import numpy as np
+import re
 
 
 class Student(Agent):
     """An Agent Student"""
 
-    def __init__(self, unique_id, model: Model, major, gender):
+    def __init__(self, unique_id, model: Model, gender):
         super().__init__(unique_id, model)
-        self.major: str = major
+
+        self.majors: List[str] = []
         self.gender: str = gender
+        self.sem_queue: Deque = deque()
+        self.seq_matcher = re.compile(r"(F1SEQ1)|(SEQ2)")
 
     def step(self):
         pass
@@ -24,17 +31,46 @@ class Student(Agent):
 class ActiveStudent(Student):
     """An Active Agent Student"""
 
-    def __init__(self, unique_id, model: Model, major, gender, state):
-        super().__init__(unique_id, model, major, gender)
+    def __init__(self, unique_id, model: Model, gender, state):
+        super().__init__(unique_id, model, gender)
 
         self.state: int = 1
+
+    def step(self):
+        pass
+
+    def advance(self):
+        if self.seq_matcher.search(self.model.semester) is None:
+            return
+
+        self.sem_queue.appendleft(f"{self.model.semester}_MAJOR")
+
+        prev_semester = (
+            tlz.first(self.sem_queue)
+            if len(self.sem_queue) == 1
+            else self.sem_queue.pop()
+        )
+
+        new_semester = f"{self.model.semester}_MAJOR"
+
+        if new_semester == prev_semester:
+            return
+
+        prev_major = tlz.last(self.majors)
+        new_major = self.model.major_switcher.get_major(
+            prev_semester, new_semester, prev_major
+        )
+
+        self.majors.append(new_major)
 
 
 class InactiveStudent(Student):
     """A Inactive Agent Student"""
-    def __init__(self, unique_id, model: Model, major, gender, state):
-        super().__init__(unique_id, model, major, gender)
 
+    def __init__(self, unique_id, model: Model, gender, state):
+        super().__init__(unique_id, model, gender)
+
+        self.majors = ["UNDECLARED"]
         self.state: int = 0
 
 
@@ -48,16 +84,21 @@ class KSUModel(Model):
         self.n_students: int = n_students
         self._semester_gen = self._gen_semester_code()
         self.semester = next(self._semester_gen)
-
-        # Generate Data for Agents
         self.ALL_GENDERS = gen_gender(self.n_students)
+
+        # Majors
+        self.F1SEQ1_MAJORS = gen_f1seq1_majors(self.n_students)
+        self.major_switcher = MajorSwitch()
 
         # Adding Student to KSU Environment
         for i in range(self.n_students):
+            # 80 percent of the students will be active, 20 will be inactive
             if np.random.binomial(1, 0.80):
-                student = ActiveStudent(i, self, "Undeclared", self.ALL_GENDERS[i], 1)
+                student = ActiveStudent(i, self, self.ALL_GENDERS[i], 1)
+
+                student.majors.append(self.F1SEQ1_MAJORS[i])
             else:
-                student = InactiveStudent(i, self, "Undeclared", self.ALL_GENDERS[i], 0)
+                student = InactiveStudent(i, self, self.ALL_GENDERS[i], 0)
 
             self.schedule.add(student)
             self.grid.position_agent(student)
@@ -81,4 +122,4 @@ class KSUModel(Model):
 
         for semester in semester_season:
             pos, season = semester
-            yield f'{season}{pos}SEQ{next(seq)}'
+            yield f"{season}{pos}SEQ{next(seq)}"
