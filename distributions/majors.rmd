@@ -313,3 +313,31 @@ s3_f4_seq2_cprob %>%
   select(S3SEQ2_MAJOR, F4SEQ2_MAJOR, cProb) %>%
   write.csv(file = "data/s3_f4_seq2_major_cprobs_2011.csv", row.names = F)
 ```
+
+## Distribution of Majors from `F4SEQ2` to `S4SEQ2`
+
+### Recode `NA`s as `UNDECLARED`
+
+```{r}
+f4_s4_seq2_df <-term_2011_df %>%
+  recode_na(F4SEQ2_MAJOR, S4SEQ2_MAJOR)
+
+summary(f4_s4_seq2_df)
+```
+
+### Computing Conditional Probability
+
+$$P(S3SEQ2_{MAJOR} | S3SEQ2_{MAJOR})$$
+
+```{r find-probabilities}
+f4_s4_seq2_cprob <- f4_s4_seq2_df %>%
+  compute_probs(F4SEQ2_MAJOR, S4SEQ2_MAJOR)
+
+head(f4_s4_seq2_cprob)
+```
+
+```{r save-probabilities, eval=F, include=F}
+f4_s4_seq2_cprob %>%
+  select(F4SEQ2_MAJOR, S4SEQ2_MAJOR, cProb) %>%
+  write.csv(file = "data/f4_s4_seq2_major_cprobs_2011.csv", row.names = F)
+```
