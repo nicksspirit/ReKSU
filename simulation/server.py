@@ -1,11 +1,12 @@
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.ModularVisualization import ModularServer
-from model import Student, ActiveStudent, InactiveStudent, KSUModel
+from model import Student, KSUModel
 from typing import Dict, Any
+from colour import Color
 import cytoolz as tlz
 
 GLOBAL_OPTS = {
-    "n_students": 150,
+    "n_students": 20,
     "width": 20,
     "height": 20,
     "width_pixels": 500,
@@ -14,24 +15,27 @@ GLOBAL_OPTS = {
 
 
 def set_agent_params(agent: Student) -> Dict:
+    curr_major = tlz.last(agent.majors)
+
     base_params: Dict[str, Any] = {
         "Layer": 1,
+        "Filled": 1,
+        "text": agent.gender,
         "text_color": "white",
-        "Gender": agent.gender
+        "CurrentMajor": curr_major,
+        "Majors": tuple(tlz.unique(agent.majors))
     }
 
-    if isinstance(agent, ActiveStudent):
-        gender = "male" if agent.gender == "M" else "female"
-        base_params["Shape"] = f"assets/images/{gender}-student.png"
-        base_params["scale"] = 0.8
-        base_params["Major"] = tuple(tlz.unique(agent.majors))
-    if isinstance(agent, InactiveStudent):
-        base_params["Filled"] = 1
-        base_params["Color"] = "grey"
+    if agent.is_active:
+        color = "grey" if curr_major == "UNDECLARED" else Color(pick_for=curr_major).hex
+        base_params["Shape"] = "circle"
+        base_params["Color"] = color
+        base_params["r"] = 1
+    else:
         base_params["Shape"] = "rect"
+        base_params["Color"] = "grey"
         base_params["w"] = 1
         base_params["h"] = 1
-        base_params["Major"] = agent.majors
 
     return base_params
 

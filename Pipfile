@@ -16,6 +16,7 @@ numpy = "*"
 cytoolz = "*"
 scipy = "*"
 pandas = "*"
+colour = "*"
 
 [requires]
 python_version = "3.7"

@@ -13,34 +13,19 @@ import re
 class Student(Agent):
     """An Agent Student"""
 
-    def __init__(self, unique_id, model: Model, gender):
+    def __init__(self, unique_id, model: Model, gender, activated=True):
         super().__init__(unique_id, model)
 
         self.majors: List[str] = []
         self.gender: str = gender
         self.sem_queue: Deque = deque()
-        self.seq_matcher = re.compile(r"(F1SEQ1)|(SEQ2)")
+        self.is_active: bool = activated
+        self._new_major = ""
 
-    def step(self):
-        pass
+    def step(self) -> None:
+        match = re.search(r"(F1SEQ1)|(SEQ2)", self.model.semester)
 
-    def advance(self):
-        pass
-
-
-class ActiveStudent(Student):
-    """An Active Agent Student"""
-
-    def __init__(self, unique_id, model: Model, gender, state):
-        super().__init__(unique_id, model, gender)
-
-        self.state: int = 1
-
-    def step(self):
-        pass
-
-    def advance(self):
-        if self.seq_matcher.search(self.model.semester) is None:
+        if match is None:
             return
 
         self.sem_queue.appendleft(f"{self.model.semester}_MAJOR")
@@ -53,25 +38,20 @@ class ActiveStudent(Student):
 
         new_semester = f"{self.model.semester}_MAJOR"
 
-        if new_semester == prev_semester:
-            return
+        if new_semester != prev_semester:
+            prev_major = tlz.last(self.majors)
+            self._new_major = self.model.major_switcher.get_major(
+                prev_semester, new_semester, prev_major
+            )
 
+    def advance(self):
         prev_major = tlz.last(self.majors)
-        new_major = self.model.major_switcher.get_major(
-            prev_semester, new_semester, prev_major
-        )
 
-        self.majors.append(new_major)
+        if self._new_major != "" and prev_major != self._new_major:
+            if not self.is_active:
+                self.is_active = True
 
-
-class InactiveStudent(Student):
-    """A Inactive Agent Student"""
-
-    def __init__(self, unique_id, model: Model, gender, state):
-        super().__init__(unique_id, model, gender)
-
-        self.majors = ["UNDECLARED"]
-        self.state: int = 0
+            self.majors.append(self._new_major)
 
 
 class KSUModel(Model):
@@ -93,12 +73,13 @@ class KSUModel(Model):
         # Adding Student to KSU Environment
         for i in range(self.n_students):
             # 80 percent of the students will be active, 20 will be inactive
-            if np.random.binomial(1, 0.80):
-                student = ActiveStudent(i, self, self.ALL_GENDERS[i], 1)
 
+            if np.random.binomial(1, 0.80):
+                student = Student(i, self, self.ALL_GENDERS[i])
                 student.majors.append(self.F1SEQ1_MAJORS[i])
             else:
-                student = InactiveStudent(i, self, self.ALL_GENDERS[i], 0)
+                student = Student(i, self, self.ALL_GENDERS[i], False)
+                student.majors.append("UNDECLARED")
 
             self.schedule.add(student)
             self.grid.position_agent(student)

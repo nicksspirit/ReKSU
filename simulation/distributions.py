@@ -96,9 +96,13 @@ class MajorSwitch:
         if (prev_sem, next_sem) not in self.sem_major_df.keys():
             return curr_major
 
-        sem_majors = self.sem_major_df[(prev_sem, next_sem)].loc[
+        sem_majors: pd.Dataframe = self.sem_major_df[(prev_sem, next_sem)].loc[
             lambda df: df[prev_sem] == curr_major
         ]
+
+        if sem_majors.empty:
+            return curr_major
+
         next_sem_major_probs = sem_majors["cProb"].values
         next_sem_majors = sem_majors[next_sem].values
 
