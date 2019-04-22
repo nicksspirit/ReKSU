@@ -7,8 +7,8 @@ verify_ssl = true
 run_sim = "python server.py"
 
 [dev-packages]
-python-language-server = {extras = ["yapf"],version = "*"}
-black = "*"
+python-language-server = "*"
+black = "==19.3b0"
 
 [packages]
 mesa = "*"
