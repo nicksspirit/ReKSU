@@ -1,4 +1,5 @@
 from mesa.visualization.modules import CanvasGrid, TextElement
+from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.ModularVisualization import ModularServer
 from model import Student, KSUModel
 from typing import Dict, Any
@@ -6,7 +7,6 @@ from colour import Color
 import cytoolz as tlz
 
 GLOBAL_OPTS = {
-    "n_students": 20,
     "width": 20,
     "height": 20,
     "width_pixels": 500,
@@ -19,11 +19,11 @@ def set_agent_params(agent: Student) -> Dict:
 
     base_params: Dict[str, Any] = {
         "Layer": 1,
-        "Filled": 1,
+        "Filled": "true",
         "text": agent.gender,
         "text_color": "white",
         "CurrentMajor": curr_major,
-        "Majors": tuple(tlz.unique(agent.majors))
+        "Majors": tuple(tlz.unique(agent.majors)),
     }
 
     if agent.is_active:
@@ -40,8 +40,12 @@ def set_agent_params(agent: Student) -> Dict:
     return base_params
 
 
+student_slider = UserSettableParameter(
+    "slider", "Number of Students", value=20, min_value=10, max_value=150, step=1
+)
+
 model_params = {
-    "n_students": GLOBAL_OPTS["n_students"],
+    "n_students": student_slider,
     "width": GLOBAL_OPTS["width"],
     "height": GLOBAL_OPTS["height"],
 }
