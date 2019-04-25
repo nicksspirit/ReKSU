@@ -6,8 +6,8 @@
 *.pyc
 
 # Sublime Text
-odintech.ksu_retention_simulator.sublime-project
-odintech.ksu_retention_simulator.sublime-workspace
+*.sublime-project
+*.sublime-workspace
 
 # VS Code
 .vscode/
