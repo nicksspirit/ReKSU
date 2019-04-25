@@ -6,12 +6,7 @@ from typing import Dict, Any
 from colour import Color
 import cytoolz as tlz
 
-GLOBAL_OPTS = {
-    "width": 20,
-    "height": 20,
-    "width_pixels": 500,
-    "height_pixels": 500,
-}
+GLOBAL_OPTS = {"width": 20, "height": 20, "width_pixels": 500, "height_pixels": 500}
 
 
 def set_agent_params(agent: Student) -> Dict:
@@ -44,8 +39,18 @@ student_slider = UserSettableParameter(
     "slider", "Number of Students", value=20, min_value=10, max_value=150, step=1
 )
 
+active_students = UserSettableParameter(
+    "slider",
+    "Number of Active Students",
+    value=80,
+    min_value=10,
+    max_value=100,
+    step=10,
+)
+
 model_params = {
     "n_students": student_slider,
+    "n_active": active_students,
     "width": GLOBAL_OPTS["width"],
     "height": GLOBAL_OPTS["height"],
 }

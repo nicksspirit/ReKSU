@@ -57,7 +57,7 @@ class Student(Agent):
 class KSUModel(Model):
     """A model simulating KSU student"""
 
-    def __init__(self, n_students, width: int, height: int):
+    def __init__(self, n_students, n_active: int, width: int, height: int):
         self.running = True
         self.schedule = SimultaneousActivation(self)
         self.grid = SingleGrid(width, height, torus=False)
@@ -73,8 +73,8 @@ class KSUModel(Model):
         # Adding Student to KSU Environment
         for i in range(self.n_students):
             # 80 percent of the students will be active, 20 will be inactive
-
-            if np.random.binomial(1, 0.80):
+            per_active = n_active / 100
+            if np.random.binomial(1, per_active):
                 student = Student(i, self, self.ALL_GENDERS[i])
                 student.majors.append(self.F1SEQ1_MAJORS[i])
             else:
