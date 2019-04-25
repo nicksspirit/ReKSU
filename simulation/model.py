@@ -45,13 +45,13 @@ class Student(Agent):
             )
 
     def advance(self):
-        prev_major = tlz.last(self.majors)
+        if self._new_major == "":
+            return
 
-        if self._new_major != "" and prev_major != self._new_major:
-            if not self.is_active:
-                self.is_active = True
+        if not self.is_active:
+            self.is_active = True
 
-            self.majors.append(self._new_major)
+        self.majors.append(self._new_major)
 
 
 class KSUModel(Model):

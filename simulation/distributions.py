@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from typing import List, Tuple, Dict
 from pathlib import Path
-import cytoolz as tlz
 
 DATA_PATH = Path.cwd().parent / "distributions" / "data"
 
@@ -101,13 +100,9 @@ class MajorSwitch:
         ]
 
         if sem_majors.empty:
-            return curr_major
+            return ""
 
         next_sem_major_probs = sem_majors["cProb"].values
         next_sem_majors = sem_majors[next_sem].values
 
-        return tlz.first(
-            np.random.choice(
-                next_sem_majors, size=1, replace=True, p=next_sem_major_probs
-            )
-        )
+        return np.random.choice(next_sem_majors, p=next_sem_major_probs)
