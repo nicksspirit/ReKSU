@@ -3,7 +3,7 @@ import numpy as np
 from typing import List, Tuple, Dict
 from pathlib import Path
 
-DATA_PATH = Path.cwd().parent / "distributions" / "data"
+DATA_PATH = Path.cwd() / "distributions" / "data"
 
 # F1SEQ1_MAJORS (2011)
 

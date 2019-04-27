@@ -1,7 +1,7 @@
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.ModularVisualization import ModularServer
-from model import Student, KSUModel
+from .model import Student, KSUModel
 from typing import Dict, Any
 from colour import Color
 import cytoolz as tlz
@@ -59,7 +59,7 @@ model_params = {
 class SemesterElement(TextElement):
     """Display the semester code"""
 
-    local_includes = ["assets/js/TextModule.js"]
+    local_includes = ["./simulation/assets/js/TextModule.js"]
 
     def __init__(self):
         pass
@@ -78,9 +78,6 @@ canvas_grid = CanvasGrid(
 
 semester_code = SemesterElement()
 
-server = ModularServer(
+server: ModularServer = ModularServer(
     KSUModel, [canvas_grid, semester_code], "KSU Simulation", model_params
 )
-
-server.port = 8521  # The default
-server.launch()

@@ -1,7 +1,7 @@
 from mesa import Agent, Model
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation
-from distributions import gen_gender, gen_f1seq1_majors, MajorSwitch
+from .distributions import gen_gender, gen_f1seq1_majors, MajorSwitch
 from itertools import product, cycle
 from typing import List, Deque
 from collections import deque
