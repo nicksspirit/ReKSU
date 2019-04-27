@@ -41,43 +41,43 @@ def gen_gender(n_students: int) -> List[str]:
 
 
 class MajorSwitch:
-    sem_major_df: Dict[Tuple[str, str], pd.DataFrame] = {}
+    sem_major: Dict[Tuple[str, str], pd.DataFrame] = {}
 
     def __init__(self):
-        self.sem_major_df[("F1SEQ1_MAJOR", "F1SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F1SEQ1_MAJOR", "F1SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f1seq1_2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("F1SEQ2_MAJOR", "S1SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F1SEQ2_MAJOR", "S1SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f1_s1_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("S1SEQ2_MAJOR", "F2SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("S1SEQ2_MAJOR", "F2SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "s1_f2_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("F2SEQ2_MAJOR", "S2SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F2SEQ2_MAJOR", "S2SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f2_s2_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("S2SEQ2_MAJOR", "F3SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("S2SEQ2_MAJOR", "F3SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "s2_f3_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("F3SEQ2_MAJOR", "S3SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F3SEQ2_MAJOR", "S3SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f3_s3_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("S3SEQ2_MAJOR", "F4SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("S3SEQ2_MAJOR", "F4SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "s3_f4_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("F4SEQ2_MAJOR", "S4SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F4SEQ2_MAJOR", "S4SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f4_s4_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("S4SEQ2_MAJOR", "F5SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("S4SEQ2_MAJOR", "F5SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "s4_f5_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("F5SEQ2_MAJOR", "S5SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F5SEQ2_MAJOR", "S5SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f5_s5_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("S5SEQ2_MAJOR", "F6SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("S5SEQ2_MAJOR", "F6SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "s5_f6_seq2_major_cprobs_2011.csv"
         )
-        self.sem_major_df[("F6SEQ2_MAJOR", "S6SEQ2_MAJOR")] = pd.read_csv(
+        self.sem_major[("F6SEQ2_MAJOR", "S6SEQ2_MAJOR")] = pd.read_csv(
             DATA_PATH / "f6_s6_seq2_major_cprobs_2011.csv"
         )
 
@@ -92,10 +92,10 @@ class MajorSwitch:
         Returns: most probable major
             str
         """
-        if (prev_sem, next_sem) not in self.sem_major_df.keys():
+        if (prev_sem, next_sem) not in self.sem_major.keys():
             return curr_major
 
-        sem_majors: pd.Dataframe = self.sem_major_df[(prev_sem, next_sem)].loc[
+        sem_majors: pd.Dataframe = self.sem_major[(prev_sem, next_sem)].loc[
             lambda df: df[prev_sem] == curr_major
         ]
 
