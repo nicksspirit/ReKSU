@@ -1,7 +1,7 @@
 from mesa import Agent, Model
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation
-from .distributions import gen_gender, gen_f1seq1_majors, MajorSwitch
+from .distributions import gen_gender, gen_credit_hrs, gen_f1seq1_majors, MajorSwitch
 from itertools import product, cycle
 from typing import List, Deque
 from collections import deque
@@ -20,6 +20,9 @@ class Student(Agent):
         self.gender: str = gender
         self.sem_queue: Deque = deque()
         self.is_active: bool = activated
+        self.earned_hrs: List[int] = [0]
+        self.attempted_hrs: List[int] = [0]
+        self.gpa: List[int] = [0]
         self._new_major = ""
 
     def step(self) -> None:
@@ -72,8 +75,9 @@ class KSUModel(Model):
 
         # Adding Student to KSU Environment
         for i in range(self.n_students):
-            # 80 percent of the students will be active, 20 will be inactive
+            # Percentage of student agent that will be active and the rest inactive
             per_active = n_active / 100
+
             if np.random.binomial(1, per_active):
                 student = Student(i, self, self.ALL_GENDERS[i])
                 student.majors.append(self.F1SEQ1_MAJORS[i])
@@ -89,11 +93,72 @@ class KSUModel(Model):
 
         try:
             self.update_semester()
+            self.update_credit_hrs()
+            self.update_gpa()
         except StopIteration:
             self.running = False
 
     def update_semester(self) -> None:
         self.semester = next(self._semester_gen)
+
+    def update_credit_hrs(self):
+        active_students: List[Student] = [
+            student for student in self.schedule.agents if student.is_active
+        ]
+        n_active_students = len(active_students)
+
+        earned_hrs = [
+            round(earned_hr)
+            for earned_hr in gen_credit_hrs(self.semester, n_active_students)
+        ]
+        attempted_hrs = [
+            round(attempted_hr)
+            for attempted_hr in gen_credit_hrs(self.semester, n_active_students, False)
+        ]
+
+        for i, student in enumerate(active_students):
+            curr_major = tlz.last(student.majors)
+
+            # Check if earned & attempted credit hours exists for current semester
+            if earned_hrs:
+                new_earned_hrs = 0 if curr_major == "UNDECLARED" else earned_hrs[i]
+                new_attempted_hrs = (
+                    0 if curr_major == "UNDECLARED" else attempted_hrs[i]
+                )
+            else:
+                new_earned_hrs = (
+                    0 if curr_major == "UNDECLARED" else tlz.last(student.earned_hrs)
+                )
+                new_attempted_hrs = (
+                    0
+                    if curr_major == "UNDECLARED"
+                    else tlz.last(student.attempted_hrs)
+                )
+
+            student.earned_hrs.append(new_earned_hrs)
+            student.attempted_hrs.append(new_attempted_hrs)
+
+    def update_gpa(self):
+        active_students: List[Student] = [
+            student for student in self.schedule.agents if student.is_active
+        ]
+        n_active_students = len(active_students)
+
+        gpa = [
+            round(earned_hr)
+            for earned_hr in gen_credit_hrs(self.semester, n_active_students)
+        ]
+
+        for i, student in enumerate(active_students):
+            curr_major = tlz.last(student.majors)
+
+            # Check if gpa exists for current semester
+            if gpa:
+                new_gpa = 0 if curr_major == "UNDECLARED" else gpa[i]
+            else:
+                new_gpa = 0 if curr_major == "UNDECLARED" else tlz.last(student.gpa)
+
+            student.gpa.append(new_gpa)
 
     @staticmethod
     def _gen_semester_code():

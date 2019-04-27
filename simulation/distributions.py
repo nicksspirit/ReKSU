@@ -5,6 +5,39 @@ from pathlib import Path
 
 DATA_PATH = Path.cwd() / "distributions" / "data"
 
+# GPA (Weibull)
+
+gpa_df = pd.read_csv(DATA_PATH / "gpa_weibull.csv", index_col="semester")
+
+
+def gen_gpa(semester: str, n_students: int) -> List[str]:
+    if semester not in gpa_df.index:
+        return []
+
+    scale, shape = gpa_df.loc[semester, :]
+
+    return np.random.weibull(shape, n_students) * scale
+
+
+# Earned & Attempted Credit Hours (Normal)
+
+earned_hrs_df = pd.read_csv(DATA_PATH / "earned_hrs_normal.csv", index_col="semester")
+attempted_hrs_df = pd.read_csv(
+    DATA_PATH / "attempted_hrs_normal.csv", index_col="semester"
+)
+
+
+def gen_credit_hrs(semester: str, n_students: int, is_earned=True) -> List[int]:
+    credit_hr_df = earned_hrs_df if is_earned else attempted_hrs_df
+
+    if semester not in credit_hr_df.index:
+        return []
+
+    mean, std = credit_hr_df.loc[semester, :]
+
+    return np.random.normal(mean, std, n_students)
+
+
 # F1SEQ1_MAJORS (2011)
 
 f1seq1_majors_df = pd.read_csv(
