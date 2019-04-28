@@ -29,10 +29,10 @@ term_2011_df <- cob_rt %>% filter(TERM == 201180)
 
 ## Distribution of Majors in `F1_SEQ1`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r recode_na}
-recode_na <- function(df, ..., replacement = c("UNDECLARED")){
+recode_na <- function(df, ..., replacement = c("E")){
   # capture expressions and create quosures
   dots <- enquos(...)
   col_names <- as.character(dots) %>% gsub("~", "", .)
@@ -84,7 +84,7 @@ f1seq1_major_probs %>%
 
 ## Distribution of Majors from `F1SEQ1` to `F1SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f1_seq1_2_df <-term_2011_df %>%
@@ -96,6 +96,7 @@ summary(f1_seq1_2_df)
 ### Computing Conditional Probability
 
 $$P(F1SEQ2_{MAJOR} | F1SEQ1_{MAJOR})$$
+
 ```{r compute_probs}
 compute_probs <- function(df, ...) {
   # capture expressions and create quosures
@@ -130,7 +131,7 @@ f1_seq1_2_cprob %>%
 
 ## Distribution of Majors from `F1SEQ2` to `S1SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f1_s1_seq2_df <-term_2011_df %>%
@@ -158,7 +159,7 @@ f1_s1_seq2_cprob %>%
 
 ## Distribution of Majors from `S1SEQ2` to `F2SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 s1_f2_seq2_df <-term_2011_df %>%
@@ -186,7 +187,7 @@ s1_f2_seq2_cprob %>%
 
 ## Distribution of Majors from `F2SEQ2` to `S2SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f2_s2_seq2_df <-term_2011_df %>%
@@ -214,7 +215,7 @@ f2_s2_seq2_cprob %>%
 
 ## Distribution of Majors from `S2SEQ2` to `F3SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 s2_f3_seq2_df <-term_2011_df %>%
@@ -242,7 +243,7 @@ s2_f3_seq2_cprob %>%
 
 ## Distribution of Majors from `F3SEQ2` to `S3SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f3_s3_seq2_df <-term_2011_df %>%
@@ -270,7 +271,7 @@ f3_s3_seq2_cprob %>%
 
 ## Distribution of Majors from `S3SEQ2` to `F4SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 s3_f4_seq2_df <-term_2011_df %>%
@@ -298,7 +299,7 @@ s3_f4_seq2_cprob %>%
 
 ## Distribution of Majors from `F4SEQ2` to `S4SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f4_s4_seq2_df <-term_2011_df %>%
@@ -326,7 +327,7 @@ f4_s4_seq2_cprob %>%
 
 ## Distribution of Majors from `S4SEQ2` to `F5SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 s4_f5_seq2_df <-term_2011_df %>%
@@ -354,7 +355,7 @@ s4_f5_seq2_cprob %>%
 
 ## Distribution of Majors from `F5SEQ2` to `S5SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f5_s5_seq2_df <-term_2011_df %>%
@@ -382,7 +383,7 @@ f5_s5_seq2_cprob %>%
 
 ## Distribution of Majors from `S5SEQ2` to `F6SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 s5_f6_seq2_df <-term_2011_df %>%
@@ -410,7 +411,7 @@ s5_f6_seq2_cprob %>%
 
 ## Distribution of Majors from `F6SEQ2` to `S6SEQ2`
 
-### Recode `NA`s as `UNDECLARED`
+### Recode `NA`s as `E`
 
 ```{r}
 f6_s6_seq2_df <-term_2011_df %>%

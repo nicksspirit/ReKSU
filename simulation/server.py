@@ -22,7 +22,7 @@ def set_agent_params(agent: Student) -> Dict:
     }
 
     if agent.is_active:
-        color = "grey" if curr_major == "UNDECLARED" else Color(pick_for=curr_major).hex
+        color = "grey" if curr_major == "E" else Color(pick_for=curr_major).hex
         base_params["Earned Credit Hours"] = tlz.last(agent.earned_hrs)
         base_params["Attempted Credit Hours"] = tlz.last(agent.attempted_hrs)
         base_params["GPA"] = tlz.last(agent.gpa)

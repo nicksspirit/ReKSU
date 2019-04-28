@@ -83,7 +83,7 @@ class KSUModel(Model):
                 student.majors.append(self.F1SEQ1_MAJORS[i])
             else:
                 student = Student(i, self, self.ALL_GENDERS[i], False)
-                student.majors.append("UNDECLARED")
+                student.majors.append("E")
 
             self.schedule.add(student)
             self.grid.position_agent(student)
@@ -121,17 +121,17 @@ class KSUModel(Model):
 
             # Check if earned & attempted credit hours exists for current semester
             if earned_hrs:
-                new_earned_hrs = 0 if curr_major == "UNDECLARED" else earned_hrs[i]
+                new_earned_hrs = 0 if curr_major == "E" else earned_hrs[i]
                 new_attempted_hrs = (
-                    0 if curr_major == "UNDECLARED" else attempted_hrs[i]
+                    0 if curr_major == "E" else attempted_hrs[i]
                 )
             else:
                 new_earned_hrs = (
-                    0 if curr_major == "UNDECLARED" else tlz.last(student.earned_hrs)
+                    0 if curr_major == "E" else tlz.last(student.earned_hrs)
                 )
                 new_attempted_hrs = (
                     0
-                    if curr_major == "UNDECLARED"
+                    if curr_major == "E"
                     else tlz.last(student.attempted_hrs)
                 )
 
@@ -154,9 +154,9 @@ class KSUModel(Model):
 
             # Check if gpa exists for current semester
             if gpa:
-                new_gpa = 0 if curr_major == "UNDECLARED" else gpa[i]
+                new_gpa = 0 if curr_major == "E" else gpa[i]
             else:
-                new_gpa = 0 if curr_major == "UNDECLARED" else tlz.last(student.gpa)
+                new_gpa = 0 if curr_major == "E" else tlz.last(student.gpa)
 
             student.gpa.append(new_gpa)
 
