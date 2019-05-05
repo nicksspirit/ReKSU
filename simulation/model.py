@@ -118,21 +118,14 @@ class KSUModel(Model):
 
         for i, student in enumerate(active_students):
             curr_major = tlz.last(student.majors)
+            new_earned_hrs = tlz.last(student.earned_hrs)
+            new_attempted_hrs = tlz.last(student.attempted_hrs)
 
             # Check if earned & attempted credit hours exists for current semester
             if earned_hrs:
                 new_earned_hrs = 0 if curr_major == "E" else earned_hrs[i]
                 new_attempted_hrs = (
                     0 if curr_major == "E" else attempted_hrs[i]
-                )
-            else:
-                new_earned_hrs = (
-                    0 if curr_major == "E" else tlz.last(student.earned_hrs)
-                )
-                new_attempted_hrs = (
-                    0
-                    if curr_major == "E"
-                    else tlz.last(student.attempted_hrs)
                 )
 
             student.earned_hrs.append(new_earned_hrs)
@@ -151,12 +144,11 @@ class KSUModel(Model):
 
         for i, student in enumerate(active_students):
             curr_major = tlz.last(student.majors)
+            new_gpa = tlz.last(student.gpa)
 
             # Check if gpa exists for current semester
             if gpa:
                 new_gpa = 0 if curr_major == "E" else gpa[i]
-            else:
-                new_gpa = 0 if curr_major == "E" else tlz.last(student.gpa)
 
             student.gpa.append(new_gpa)
 
