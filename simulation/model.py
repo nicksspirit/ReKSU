@@ -83,7 +83,7 @@ class KSUModel(Model):
                 student.majors.append(self.F1SEQ1_MAJORS[i])
             else:
                 student = Student(i, self, self.ALL_GENDERS[i], False)
-                student.majors.append("E")
+                student.majors.append("N/A")
 
             self.schedule.add(student)
             self.grid.position_agent(student)
