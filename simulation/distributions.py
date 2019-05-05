@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Iterable, Generator
 from pathlib import Path
 
 DATA_PATH = Path.cwd() / "distributions" / "data"
@@ -21,13 +21,30 @@ def gen_gpa(semester: str, n_students: int) -> List[str]:
 
 # Earned & Attempted Credit Hours (Normal)
 
+
+def gen_pos_normal(mean: float, std: float, size: int) -> Generator:
+    count = size
+
+    def rand_normal(mean: float, std: float) -> float:
+        rand_n = np.random.normal(mean, std)
+
+        if rand_n < 0:
+            rand_n = rand_normal(mean, std)
+
+        return rand_n
+
+    while count != 0:
+        yield rand_normal(mean, std)
+        count -= 1
+
+
 earned_hrs_df = pd.read_csv(DATA_PATH / "earned_hrs_normal.csv", index_col="semester")
 attempted_hrs_df = pd.read_csv(
     DATA_PATH / "attempted_hrs_normal.csv", index_col="semester"
 )
 
 
-def gen_credit_hrs(semester: str, n_students: int, is_earned=True) -> List[int]:
+def gen_credit_hrs(semester: str, n_students: int, is_earned=True) -> Iterable[int]:
     credit_hr_df = earned_hrs_df if is_earned else attempted_hrs_df
 
     if semester not in credit_hr_df.index:
@@ -35,7 +52,7 @@ def gen_credit_hrs(semester: str, n_students: int, is_earned=True) -> List[int]:
 
     mean, std = credit_hr_df.loc[semester, :]
 
-    return np.random.normal(mean, std, n_students)
+    return gen_pos_normal(mean, std, n_students)
 
 
 # F1SEQ1_MAJORS (2011)
