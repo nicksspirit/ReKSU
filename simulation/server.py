@@ -1,10 +1,11 @@
-from mesa.visualization.modules import CanvasGrid, TextElement
+from mesa.visualization.modules import CanvasGrid, TextElement, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
-from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.ModularVisualization import ModularServer, VisualizationElement
 from .model import Student, KSUModel
 from typing import Dict, Any
 from colour import Color
 import cytoolz as tlz
+import numpy as np
 
 GLOBAL_OPTS = {"width": 20, "height": 20, "width_pixels": 500, "height_pixels": 500}
 
@@ -23,9 +24,9 @@ def set_agent_params(agent: Student) -> Dict:
 
     if agent.is_active:
         color = "grey" if curr_major == "E" else Color(pick_for=curr_major).hex
-        base_params["Earned Credit Hours"] = tlz.last(agent.earned_hrs)
-        base_params["Attempted Credit Hours"] = tlz.last(agent.attempted_hrs)
-        base_params["GPA"] = tlz.last(agent.gpa)
+        base_params["Earned Credit Hours"] = agent.earned_hrs
+        base_params["Attempted Credit Hours"] = agent.attempted_hrs
+        base_params["GPA"] = agent.gpa
         base_params["Shape"] = "circle"
         base_params["Color"] = color
         base_params["r"] = 1
@@ -45,7 +46,7 @@ student_slider = UserSettableParameter(
 active_students = UserSettableParameter(
     "slider",
     "Number of Active Students",
-    value=80,
+    value=100,
     min_value=10,
     max_value=100,
     step=10,
@@ -71,6 +72,23 @@ class SemesterElement(TextElement):
         return f"Semester: {model.semester}"
 
 
+class HistogramModule(VisualizationElement):
+    package_includes = ["Chart.min.js"]
+    local_includes = ["./simulation/assets/js/HistogramModule.js"]
+
+    def __init__(self, bins, canvas_height, canvas_width):
+        self.canvas_height = canvas_height
+        self.canvas_width = canvas_width
+        self.bins = bins
+        new_element = f"new HistogramModule({bins}, {canvas_width}, {canvas_height})"
+        self.js_code = f"elements.push({new_element});"
+
+    def render(self, model: KSUModel):
+        gpa_vals = [student.gpa for student in model.schedule.agents]
+        hist = tlz.first(np.histogram(gpa_vals, bins=self.bins))
+        return [int(x) for x in hist]
+
+
 canvas_grid = CanvasGrid(
     set_agent_params,
     GLOBAL_OPTS["width"],
@@ -78,6 +96,12 @@ canvas_grid = CanvasGrid(
     GLOBAL_OPTS["width_pixels"],
     GLOBAL_OPTS["height_pixels"],
 )
+
+# avg_gpa_chart = ChartModule(
+#     [{"Label": "Avg GPA", "Color": "Black"}], data_collector_name="datacollector"
+# )
+
+# hist_chart = HistogramModule(list(range(10)), 200, 500)
 
 semester_code = SemesterElement()
 

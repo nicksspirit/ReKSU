@@ -1,4 +1,5 @@
 from mesa import Agent, Model
+from mesa.datacollection import DataCollector
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation
 from .distributions import gen_gender, gen_credit_hrs, gen_f1seq1_majors, MajorSwitch
@@ -20,9 +21,9 @@ class Student(Agent):
         self.gender: str = gender
         self.sem_queue: Deque = deque()
         self.is_active: bool = activated
-        self.earned_hrs: List[int] = [0]
-        self.attempted_hrs: List[int] = [0]
-        self.gpa: List[int] = [0]
+        self.earnedhrs_history: List[int] = [0]
+        self.attemptedhrs_history: List[int] = [0]
+        self.gpa_history: List[int] = [0]
         self._new_major = ""
 
     def step(self) -> None:
@@ -56,6 +57,22 @@ class Student(Agent):
 
         self.majors.append(self._new_major)
 
+    @property
+    def gpa(self) -> int:
+        return tlz.last(self.gpa_history)
+
+    @property
+    def earned_hrs(self) -> int:
+        return tlz.last(self.earnedhrs_history)
+
+    @property
+    def attempted_hrs(self) -> int:
+        return tlz.last(self.attemptedhrs_history)
+
+    @property
+    def curr_major(self) -> str:
+        return tlz.last(self.majors)
+
 
 class KSUModel(Model):
     """A model simulating KSU student"""
@@ -88,7 +105,17 @@ class KSUModel(Model):
             self.schedule.add(student)
             self.grid.position_agent(student)
 
+        self.datacollector = DataCollector(
+            agent_reporters={
+                "GPA": "gpa",
+                "ATTEMPTED_HRS": "attempted_hrs",
+                "EARNED_HRS": "earned_hrs",
+                "Major": "curr_major"
+            }
+        )
+
     def step(self):
+        self.datacollector.collect(self)
         self.schedule.step()
 
         try:
@@ -96,6 +123,8 @@ class KSUModel(Model):
             self.update_credit_hrs()
             self.update_gpa()
         except StopIteration:
+            agent_gpa = self.datacollector.get_agent_vars_dataframe()
+            agent_gpa.to_csv("gpa.csv", index=False)
             self.running = False
 
     def update_semester(self) -> None:
@@ -118,18 +147,16 @@ class KSUModel(Model):
 
         for i, student in enumerate(active_students):
             curr_major = tlz.last(student.majors)
-            new_earned_hrs = tlz.last(student.earned_hrs)
-            new_attempted_hrs = tlz.last(student.attempted_hrs)
+            new_earned_hrs = student.earned_hrs
+            new_attempted_hrs = student.attempted_hrs
 
             # Check if earned & attempted credit hours exists for current semester
             if earned_hrs:
                 new_earned_hrs = 0 if curr_major == "E" else earned_hrs[i]
-                new_attempted_hrs = (
-                    0 if curr_major == "E" else attempted_hrs[i]
-                )
+                new_attempted_hrs = 0 if curr_major == "E" else attempted_hrs[i]
 
-            student.earned_hrs.append(new_earned_hrs)
-            student.attempted_hrs.append(new_attempted_hrs)
+            student.earnedhrs_history.append(new_earned_hrs)
+            student.attemptedhrs_history.append(new_attempted_hrs)
 
     def update_gpa(self):
         active_students: List[Student] = [
@@ -137,20 +164,20 @@ class KSUModel(Model):
         ]
         n_active_students = len(active_students)
 
-        gpa = [
+        gpa_distr = [
             round(earned_hr)
             for earned_hr in gen_credit_hrs(self.semester, n_active_students)
         ]
 
         for i, student in enumerate(active_students):
             curr_major = tlz.last(student.majors)
-            new_gpa = tlz.last(student.gpa)
+            new_gpa = student.gpa
 
             # Check if gpa exists for current semester
-            if gpa:
-                new_gpa = 0 if curr_major == "E" else gpa[i]
+            if gpa_distr:
+                new_gpa = 0 if curr_major == "E" else gpa_distr[i]
 
-            student.gpa.append(new_gpa)
+            student.gpa_history.append(new_gpa)
 
     @staticmethod
     def _gen_semester_code():
